@@ -15,8 +15,8 @@ public class Board implements Serializable {
     private Map<Integer, Tile> tiles = new HashMap<>();
 
 
-    Board(BoardConfiguration boardConfiguration) {
-
+    public Board(BoardConfiguration boardConfiguration) {
+        this.boardConfiguration = boardConfiguration;
         pieces = new Piece[boardConfiguration.getROW_NUM()][boardConfiguration.getCOL_NUM()];
 
         createPiecesAndTiles(boardConfiguration.getTileIdsForPieces());
