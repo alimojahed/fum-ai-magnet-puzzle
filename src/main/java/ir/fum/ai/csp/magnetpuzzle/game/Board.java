@@ -186,7 +186,7 @@ public class Board implements Serializable {
         return true;
     }
 
-    private boolean piecesHasOppositePole(Piece p1, Piece p2) {
+    public boolean piecesHasOppositePole(Piece p1, Piece p2) {
         if (pieceHasPole(p1) && pieceHasPole(p2)) {
             return p1.getContent().getMagneticPole() == -p2.getContent().getMagneticPole();
         }
@@ -240,6 +240,14 @@ public class Board implements Serializable {
         }
 
         return pieces;
+    }
+
+    public Piece getPieceByPos(int x, int y) {
+        if (x >= boardConfiguration.getROW_NUM() || y >= boardConfiguration.getCOL_NUM() || x < 0 || y < 0) {
+            return null;
+        }
+
+        return pieces[x][y];
     }
 
 }
