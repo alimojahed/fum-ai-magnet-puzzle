@@ -1,14 +1,20 @@
 package ir.fum.ai.csp.magnetpuzzle.game;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ali Mojahed on 12/21/2021
  * @project magnet-puzzle
  **/
 
+
+@Getter
 public class Board implements Serializable {
     private BoardConfiguration boardConfiguration;
     private Piece[][] pieces;
@@ -80,9 +86,8 @@ public class Board implements Serializable {
 
         piece.setContent(pieceContent);
         boolean canSet = true;
-        if (piece.getTile().getFirst().getContent() != PieceContent.None &&
-                piece.getTile().getSecond().getContent() != PieceContent.None &&
-                piece.getTile().getFirst().getContent().getMagneticPole() != -piece.getTile().getSecond().getContent().getMagneticPole()) {
+
+        if (!tilePiecesHasValidPoles(piece.getTile())) {
             canSet = false;
         }
 
@@ -102,9 +107,17 @@ public class Board implements Serializable {
         return canSet;
     }
 
-    private void setPoleOn(int x, int y, PieceContent pole) {
+    public boolean tilePiecesHasValidPoles(Tile tile) {
+        if (tile.getFirst().getContent() == PieceContent.None || tile.getSecond().getContent() == PieceContent.None) {
+            return true;
+        }
+
+        return tile.getFirst().getContent().getMagneticPole() == -tile.getSecond().getContent().getMagneticPole();
+
+    }
+
+    public void setPoleOn(int x, int y, PieceContent pole) {
         pieces[x][y].setContent(pole);
-        //TODO: implement a mechanism to undo actions
     }
 
     private boolean rowColConstraintsIsMet() {
@@ -183,6 +196,50 @@ public class Board implements Serializable {
 
     private boolean pieceHasPole(Piece p) {
         return p.getContent() != PieceContent.None;
+    }
+
+    public Set<Piece> getNeighborsOf(Piece p) {
+        Set<Piece> neighbors = new HashSet<>();
+        int i = p.getPosition().getX();
+        int j = p.getPosition().getY();
+
+        if (i - 1 >= 0 && !piecesHasOppositePole(pieces[i][j], pieces[i - 1][j])) {
+            neighbors.add(pieces[i - 1][j]);
+        }
+
+        if (i + 1 < boardConfiguration.getROW_NUM() && !piecesHasOppositePole(pieces[i][j], pieces[i + 1][j])) {
+            neighbors.add(pieces[i + 1][j]);
+        }
+
+        if (j + 1 < boardConfiguration.getCOL_NUM() && !piecesHasOppositePole(pieces[i][j], pieces[i][j + 1])) {
+            neighbors.add(pieces[i][j + 1]);
+        }
+
+        if (j - 1 >= 0 && !piecesHasOppositePole(pieces[i][j], pieces[i][j - 1])) {
+            neighbors.add(pieces[i][j - 1]);
+        }
+
+        return neighbors;
+    }
+
+    public Set<Piece> getPiecesInRow(int row) {
+        Set<Piece> pieces = new HashSet<>();
+
+        for (int j = 0; j < boardConfiguration.getCOL_NUM(); j++) {
+            pieces.add(this.pieces[row][j]);
+        }
+
+        return pieces;
+    }
+
+    public Set<Piece> getPiecesInCol(int col) {
+        Set<Piece> pieces = new HashSet<>();
+
+        for (int i = 0; i < boardConfiguration.getROW_NUM(); i++) {
+            pieces.add(this.pieces[i][col]);
+        }
+
+        return pieces;
     }
 
 }
