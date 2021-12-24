@@ -185,4 +185,7 @@ public class Board implements Serializable {
         return p.getContent() != PieceContent.None;
     }
 
+    public BoardConfiguration getBoardConfiguration() {
+        return boardConfiguration;
+    }
 }

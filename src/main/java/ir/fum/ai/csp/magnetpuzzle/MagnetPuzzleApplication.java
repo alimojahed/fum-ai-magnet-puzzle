@@ -1,6 +1,7 @@
 package ir.fum.ai.csp.magnetpuzzle;
 import ir.fum.ai.csp.magnetpuzzle.game.Board;
 import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.visualizer.CommandLineVisualizer;
 
 import java.util.Scanner;
 
@@ -51,5 +52,6 @@ public class MagnetPuzzleApplication
         boardConfig.setTileIdsForPieces(tileIds);
 
         Board board = new Board(boardConfig);
+
     }
 }
