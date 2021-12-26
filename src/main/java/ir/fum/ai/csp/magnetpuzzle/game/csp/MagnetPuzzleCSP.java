@@ -120,7 +120,7 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
         Predicate<Board> negativePredicate = board ->
                 board.countMagnetPolesInRow(rowIndex, PieceContent.NEGATIVE)
                         < board.getBoardConfiguration().getRowNegativeConstraints()[rowIndex];
-
+//TODO: change
         getConstraints().add(new Constraint<>(variables, positivePredicate));
         getConstraints().add(new Constraint<>(variables, negativePredicate));
     }
