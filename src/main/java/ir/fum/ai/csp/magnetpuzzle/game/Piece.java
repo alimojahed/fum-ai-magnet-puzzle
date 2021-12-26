@@ -1,9 +1,6 @@
 package ir.fum.ai.csp.magnetpuzzle.game;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -16,9 +13,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
 public class Piece implements Serializable {
+    @EqualsAndHashCode.Include
     private Position position;
+
+    @EqualsAndHashCode.Exclude
     private PieceContent content = PieceContent.None;
+
+    @EqualsAndHashCode.Exclude
     private Tile tile;
 
     public Piece(Position position) {
