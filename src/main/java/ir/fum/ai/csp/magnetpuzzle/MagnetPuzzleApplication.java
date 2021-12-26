@@ -14,6 +14,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ir.fum.ai.csp.magnetpuzzle.game.visualizer.CommandLineVisualizer;
 
 import java.io.File;
 import java.io.FileNotFoundException;

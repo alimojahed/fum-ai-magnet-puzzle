@@ -198,6 +198,10 @@ public class Board implements Serializable {
         return p.getContent() != PieceContent.None;
     }
 
+    public BoardConfiguration getBoardConfiguration() {
+        return boardConfiguration;
+    }
+
     public Set<Piece> getNeighborsOf(Piece p) {
         Set<Piece> neighbors = new HashSet<>();
         int i = p.getPosition().getX();
