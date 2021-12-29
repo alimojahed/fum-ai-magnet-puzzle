@@ -4,6 +4,8 @@ import ir.fum.ai.csp.magnetpuzzle.game.Board;
 import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
 import ir.fum.ai.csp.magnetpuzzle.graphic.GameBoard;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,10 +13,13 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import ir.fum.ai.csp.magnetpuzzle.game.visualizer.CommandLineVisualizer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,10 +47,18 @@ public class MagnetPuzzleApplication extends Application {
     }
 
     private Parent getInputFromUser() {
+        // labels
         Label label = new Label("Drag the input please.");
         Label dropped = new Label("");
+        Label title = new Label("Magnet Puzzle");
+        title.setFont(Font.font("Tahoma", FontWeight.BOLD, 30));
+        title.setTextFill(Color.WHEAT);
+        title.setPadding(new Insets(100, 20, 50, 20));
+
+        // label box
         VBox dragTarget = new VBox();
-        dragTarget.getChildren().addAll(label, dropped);
+        dragTarget.setAlignment(Pos.CENTER);
+        dragTarget.getChildren().addAll(title, label, dropped);
         dragTarget.setOnDragOver(event -> {
             if (event.getGestureSource() != dragTarget
                     && event.getDragboard().hasFiles()) {
@@ -54,6 +67,8 @@ public class MagnetPuzzleApplication extends Application {
             }
             event.consume();
         });
+        Button btn = new Button("show board");
+        btn.setDisable(true);
 
         dragTarget.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
@@ -62,20 +77,28 @@ public class MagnetPuzzleApplication extends Application {
                 dropped.setText(db.getFiles().toString());
                 readConfigFromFile(db.getFiles().get(0).getAbsolutePath());
                 success = true;
+                btn.setDisable(false);
             }
             /* let the source know whether the string was successfully
              * transferred and used */
             event.setDropCompleted(success);
             event.consume();
         });
-        Button btn = new Button("test");
-        btn.setOnMouseClicked(event -> {
-            mainStage.setScene(new Scene(firstScene(), 900, 600));
-        });
-        StackPane root = new StackPane();
-        root.getChildren().addAll(dragTarget, btn);
 
-        return root;
+        // button
+        btn.setOnMouseClicked(event ->
+                mainStage.setScene(new Scene(boardScene(), 900, 600)));
+        HBox btnBox = new HBox();
+        btnBox.getChildren().add(btn);
+        btnBox.setAlignment(Pos.CENTER);
+
+        // layout
+        BorderPane root = new BorderPane();
+        root.setTop(dragTarget);
+        root.setCenter(btnBox);
+        StackPane layout = new StackPane();
+        layout.getChildren().add(root);
+        return layout;
     }
 
     private void readConfigFromFile(String pathFile) {
@@ -123,10 +146,28 @@ public class MagnetPuzzleApplication extends Application {
         }
     }
 
-    private Parent firstScene() {
+    private Parent boardScene() {
+        // board
         GameBoard graphicalBoard = new GameBoard(board);
+        HBox boardBox = new HBox();
+        boardBox.getChildren().add(graphicalBoard);
+        boardBox.setAlignment(Pos.CENTER);
+        boardBox.setPadding(new Insets(100, 20, 20, 20));
+
+        // button
+        Button btn = new Button("solve");
+        btn.setOnAction(event -> {
+
+        });
+        HBox btnBox = new HBox();
+        btnBox.getChildren().add(btn);
+        btnBox.setAlignment(Pos.CENTER);
+        btnBox.setPadding(new Insets(50));
+
         BorderPane root = new BorderPane();
-        root.setCenter(graphicalBoard);
+        root.setCenter(boardBox);
+        root.setBottom(btnBox);
+
         StackPane layout = new StackPane();
         layout.getChildren().add(root);
         return layout;
