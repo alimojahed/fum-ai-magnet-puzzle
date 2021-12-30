@@ -1,5 +1,6 @@
-package ir.fum.ai.csp.magnetpuzzle.csp.algorithm.heuristic;
+package ir.fum.ai.csp.magnetpuzzle.csp.heuristic;
 
+import ir.fum.ai.csp.magnetpuzzle.csp.heuristic.VariablePickerHeuristic;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
 

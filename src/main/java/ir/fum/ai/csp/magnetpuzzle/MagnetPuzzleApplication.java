@@ -1,9 +1,18 @@
 package ir.fum.ai.csp.magnetpuzzle;
 
+import ir.fum.ai.csp.magnetpuzzle.config.reader.FileConfigParser;
+import ir.fum.ai.csp.magnetpuzzle.csp.algorithm.BacktrackAlgorithm;
+import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
+import ir.fum.ai.csp.magnetpuzzle.csp.solver.CSPSolverAlgorithm;
 import ir.fum.ai.csp.magnetpuzzle.game.Board;
 import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.Piece;
+import ir.fum.ai.csp.magnetpuzzle.game.PieceContent;
+import ir.fum.ai.csp.magnetpuzzle.game.csp.MagnetPuzzleCSP;
 import ir.fum.ai.csp.magnetpuzzle.graphic.GameBoard;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -11,26 +20,44 @@ import javafx.scene.control.Label;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import ir.fum.ai.csp.magnetpuzzle.game.visualizer.CommandLineVisualizer;
+import lombok.extern.log4j.Log4j2;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 /**
  * @author Ali Mojahed on 12/21/2021
  * @project magnet-puzzle
  **/
-
+@Log4j2
 public class MagnetPuzzleApplication extends Application {
     private Board board;
     private Stage mainStage;
 
-    public static void main(String[] args) {
-        launch(args); //start of graphic
+    public static void main(String[] args) throws FileNotFoundException {
+//        launch(args); //start of graphic
+        log.info("start game");
+        solveGame();
+
+    }
+
+    private static void solveGame() throws FileNotFoundException {
+        BoardConfiguration boardConfiguration = new FileConfigParser("input1_method2.txt").parseConfig();
+
+        Board board = new Board(boardConfiguration);
+
+        CSP<Board, Piece, PieceContent> problem = new MagnetPuzzleCSP(board);
+
+        CSPSolverAlgorithm<Board, Piece, PieceContent> solver = new BacktrackAlgorithm<>(problem);
+
+        solver.solve();
+
     }
 
     @Override
@@ -42,10 +69,18 @@ public class MagnetPuzzleApplication extends Application {
     }
 
     private Parent getInputFromUser() {
+        // labels
         Label label = new Label("Drag the input please.");
         Label dropped = new Label("");
+        Label title = new Label("Magnet Puzzle");
+        title.setFont(Font.font("Tahoma", FontWeight.BOLD, 30));
+        title.setTextFill(Color.WHEAT);
+        title.setPadding(new Insets(100, 20, 50, 20));
+
+        // label box
         VBox dragTarget = new VBox();
-        dragTarget.getChildren().addAll(label, dropped);
+        dragTarget.setAlignment(Pos.CENTER);
+        dragTarget.getChildren().addAll(title, label, dropped);
         dragTarget.setOnDragOver(event -> {
             if (event.getGestureSource() != dragTarget
                     && event.getDragboard().hasFiles()) {
@@ -54,79 +89,70 @@ public class MagnetPuzzleApplication extends Application {
             }
             event.consume();
         });
+        Button btn = new Button("show board");
+        btn.setDisable(true);
 
         dragTarget.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
             if (db.hasFiles()) {
                 dropped.setText(db.getFiles().toString());
-                readConfigFromFile(db.getFiles().get(0).getAbsolutePath());
+                try {
+                    readConfigFromFile(db.getFiles().get(0).getAbsolutePath());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 success = true;
+                btn.setDisable(false);
             }
             /* let the source know whether the string was successfully
              * transferred and used */
             event.setDropCompleted(success);
             event.consume();
         });
-        Button btn = new Button("test");
-        btn.setOnMouseClicked(event -> {
-            mainStage.setScene(new Scene(firstScene(), 900, 600));
-        });
-        StackPane root = new StackPane();
-        root.getChildren().addAll(dragTarget, btn);
 
-        return root;
-    }
+        // button
+        btn.setOnMouseClicked(event ->
+                mainStage.setScene(new Scene(boardScene(), 900, 600)));
+        HBox btnBox = new HBox();
+        btnBox.getChildren().add(btn);
+        btnBox.setAlignment(Pos.CENTER);
 
-    private void readConfigFromFile(String pathFile) {
-        try {
-            File myObj = new File(pathFile);
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                int row_num = myReader.nextInt();
-                int col_num = myReader.nextInt();
-                int[] positiveRows = new int[row_num];
-                int[] negativeRows = new int[row_num];
-                int[] positiveCols = new int[row_num];
-                int[] negativeCols = new int[row_num];
-                int[][] tileIds = new int[row_num][col_num];
-                BoardConfiguration boardConfig = new BoardConfiguration();
-                for (int i = 0; i < row_num; i++)
-                    positiveRows[i] = myReader.nextInt();
-
-                for (int i = 0; i < row_num; i++)
-                    negativeRows[i] = myReader.nextInt();
-
-                for (int i = 0; i < col_num; i++)
-                    positiveCols[i] = myReader.nextInt();
-
-                for (int i = 0; i < col_num; i++)
-                    negativeCols[i] = myReader.nextInt();
-
-                for (int i = 0; i < row_num; i++)
-                    for (int j = 0; j < col_num; j++)
-                        tileIds[i][j] = myReader.nextInt();
-
-                boardConfig.setROW_NUM(row_num);
-                boardConfig.setCOL_NUM(col_num);
-                boardConfig.setRowPositiveConstraint(positiveRows);
-                boardConfig.setRowNegativeConstraints(negativeRows);
-                boardConfig.setColPositiveConstraints(positiveCols);
-                boardConfig.setColNegativeConstraints(negativeCols);
-                boardConfig.setTileIdsForPieces(tileIds);
-                board = new Board(boardConfig);
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
-    }
-
-    private Parent firstScene() {
-        GameBoard graphicalBoard = new GameBoard(board);
+        // layout
         BorderPane root = new BorderPane();
-        root.setCenter(graphicalBoard);
+        root.setTop(dragTarget);
+        root.setCenter(btnBox);
+        StackPane layout = new StackPane();
+        layout.getChildren().add(root);
+        return layout;
+    }
+
+    private void readConfigFromFile(String pathFile) throws FileNotFoundException {
+        board = new Board(new FileConfigParser(pathFile).parseConfig());
+    }
+
+    private Parent boardScene() {
+        // board
+        GameBoard graphicalBoard = new GameBoard(board);
+        HBox boardBox = new HBox();
+        boardBox.getChildren().add(graphicalBoard);
+        boardBox.setAlignment(Pos.CENTER);
+        boardBox.setPadding(new Insets(100, 20, 20, 20));
+
+        // button
+        Button btn = new Button("solve");
+        btn.setOnAction(event -> {
+
+        });
+        HBox btnBox = new HBox();
+        btnBox.getChildren().add(btn);
+        btnBox.setAlignment(Pos.CENTER);
+        btnBox.setPadding(new Insets(50));
+
+        BorderPane root = new BorderPane();
+        root.setCenter(boardBox);
+        root.setBottom(btnBox);
+
         StackPane layout = new StackPane();
         layout.getChildren().add(root);
         return layout;

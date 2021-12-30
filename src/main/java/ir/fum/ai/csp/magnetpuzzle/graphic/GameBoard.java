@@ -36,12 +36,16 @@ public class GameBoard extends StackPane {
         }
         getChildren().add(boardBox);
         setConstraintsOnBoard();
+        setValuesOnBoard();
+
     }
 
     private void setConstraintsOnBoard() {
         BoardConfiguration config = board.getBoardConfiguration();
         cells[0][0].setLabel("+");
         cells[row - 1][col - 1].setLabel("-");
+        cells[0][col - 1].setLabel("#");
+        cells[row - 1][0].setLabel("#");
 
         // setting positive constraints
         for (int i = 1; i < col - 1; i++)
@@ -51,21 +55,55 @@ public class GameBoard extends StackPane {
 
         // setting negative constraints
         for (int i = 1; i < col - 1; i++)
-            cells[col - 1][i].setLabel(String.valueOf(config.getColNegativeConstraints()[i - 1]));
-        for (int i = row - 1; i < col - 1; i++)
-            cells[i][col - 1].setLabel(String.valueOf(config.getColNegativeConstraints()[i - 1]));
+            cells[row - 1][i].setLabel(String.valueOf(config.getColNegativeConstraints()[i - 1]));
+        for (int i = 1; i < row - 1; i++)
+            cells[i][col - 1].setLabel(String.valueOf(config.getRowNegativeConstraints()[i - 1]));
+    }
+
+    private void setValuesOnBoard() {
+        BoardConfiguration config = board.getBoardConfiguration();
+        for (int i = 1; i < row - 1; i++) {
+            for (int j = 1; j < col - 1; j++) {
+                cells[i][j].setValue(config.getTileIdsForPieces()[i - 1][j - 1]);
+            }
+        }
+        for (int i = 1; i < row - 1; i++) {
+            for (int j = 1; j < col - 1; j++) {
+                if ((i + 1 < row - 1 || j + 1 < col - 1)
+                        && !cells[i][j].isColored()) {
+                    int val = cells[i][j].getValue();
+                    if (cells[i][j + 1].getValue() == val) {
+                        cells[i][j].setStyle("-fx-border-style: solid hidden solid solid;");
+                        cells[i][j + 1].setStyle("-fx-border-style: solid solid solid hidden;");
+                        cells[i][j].setStyle("-fx-border-color: black thistle black black");
+                        cells[i][j + 1].setStyle("-fx-border-color: black black black thistle");
+                        cells[i][j].setColored(true);
+                        cells[i][j + 1].setColored(true);
+                    } else if (cells[i + 1][j].getValue() == val) {
+                        cells[i][j].setStyle("-fx-border-style: solid solid hidden solid;");
+                        cells[i + 1][j].setStyle("-fx-border-style: hidden solid solid solid;");
+                        cells[i][j].setStyle("-fx-border-color: black black thistle black");
+                        cells[i + 1][j].setStyle("-fx-border-color: thistle black black black");
+                        cells[i][j].setColored(true);
+                        cells[i + 1][j].setColored(true);
+                    }
+                }
+            }
+        }
     }
 
     private class Cell extends StackPane {
         private int size;
         private Label label;
+        private int value;
         private Rectangle rectangle;
+        private boolean isColored;
 
         private Cell(int size) {
             this.size = size;
             rectangle = new Rectangle(size, size);
             rectangle.setFill(Color.THISTLE);
-            rectangle.setStyle("-fx-border-color: #000;");
+            this.setStyle("-fx-border-style: solid;");
             label = new Label("");
             getChildren().addAll(rectangle, label);
         }
@@ -90,8 +128,25 @@ public class GameBoard extends StackPane {
             return rectangle;
         }
 
-        public void setRectangle(Rectangle rectangle) {
-            this.rectangle = rectangle;
+        public void changeColorOfCell(Color color) {
+            this.rectangle.setFill(color);
+            this.rectangle.setStroke(color);
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public boolean isColored() {
+            return isColored;
+        }
+
+        public void setColored(boolean colored) {
+            isColored = colored;
         }
     }
 }
