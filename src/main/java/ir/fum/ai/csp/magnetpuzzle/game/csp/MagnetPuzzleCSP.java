@@ -170,7 +170,8 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     @Override
     public void assignValueToVariable(PieceContent value, Piece variable) {
-        Piece piece = getProblem().getPieces()[variable.getPosition().getX()][variable.getPosition().getX()];
+
+        Piece piece = getProblem().getPieces()[variable.getPosition().getX()][variable.getPosition().getY()];
 
         actionHistories.push(new ActionHistory(piece, getVariable(piece).getValue(), value));
 

@@ -30,10 +30,10 @@ public class Piece implements Serializable {
 
     @Override
     public String toString() {
-        return "{ (" +
+        return "(" +
                 position.getX() +
                 ", " +
                 position.getY() +
-                ")}";
+                ")";
     }
 }

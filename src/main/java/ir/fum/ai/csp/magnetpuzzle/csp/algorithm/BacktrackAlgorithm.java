@@ -6,6 +6,9 @@ import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
 import ir.fum.ai.csp.magnetpuzzle.csp.solver.CSPSolverAlgorithm;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Mahya Ehsanimehr on 12/26/2021
  * @project magnet-puzzle
@@ -15,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolverAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> {
     private CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp;
     private boolean done = false;
+    Set<String> tracker = new HashSet<>();
 
     public BacktrackAlgorithm(CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp) {
         this.csp = csp;
@@ -29,6 +33,12 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
         System.out.println(csp.getAssignment());
         if (csp.getAssignment().size() == csp.getVariables().size()) {
             if (csp.isProblemSolved()) {
+                System.out.println("problem solved");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 done = true;
             }
             return;
@@ -40,6 +50,11 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
             if (done)
                 break;
             boolean canAssignThisVariable = true;
+
+            if (!csp.canAssignValueToVariable(value, variable.getName())) {
+                System.out.println("can not assign ");
+                continue;
+            }
 
             csp.assignValueToVariable(value, variable.getName());
 
@@ -67,17 +82,8 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
         //because we using a hash set the ordering of elements is by random and according to a hash table
         Variable<VAR_T, DOMAIN_T> v = csp.getVariables().stream()
                 .filter(variable -> !csp.getAssignment().contains(variable))
-                .findFirst()
+                .findAny()
                 .orElse(null);
-
-        System.out.println(csp.getAssignment().contains(v));
-        System.out.println(v);
-        System.out.println(csp.getAssignment());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
         return v;
     }
