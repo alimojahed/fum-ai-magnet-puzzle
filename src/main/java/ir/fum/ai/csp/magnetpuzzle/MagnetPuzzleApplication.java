@@ -1,7 +1,14 @@
 package ir.fum.ai.csp.magnetpuzzle;
 
+import ir.fum.ai.csp.magnetpuzzle.config.reader.FileConfigParser;
+import ir.fum.ai.csp.magnetpuzzle.csp.algorithm.BacktrackAlgorithm;
+import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
+import ir.fum.ai.csp.magnetpuzzle.csp.solver.CSPSolverAlgorithm;
 import ir.fum.ai.csp.magnetpuzzle.game.Board;
 import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.Piece;
+import ir.fum.ai.csp.magnetpuzzle.game.PieceContent;
+import ir.fum.ai.csp.magnetpuzzle.game.csp.MagnetPuzzleCSP;
 import ir.fum.ai.csp.magnetpuzzle.graphic.GameBoard;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -20,22 +27,37 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
 
 /**
  * @author Ali Mojahed on 12/21/2021
  * @project magnet-puzzle
  **/
-
+@Log4j2
 public class MagnetPuzzleApplication extends Application {
     private Board board;
     private Stage mainStage;
 
-    public static void main(String[] args) {
-        launch(args); //start of graphic
+    public static void main(String[] args) throws FileNotFoundException {
+//        launch(args); //start of graphic
+        log.info("start game");
+        solveGame();
+
+    }
+
+    private static void solveGame() throws FileNotFoundException {
+        BoardConfiguration boardConfiguration = new FileConfigParser("input1_method2.txt").parseConfig();
+
+        Board board = new Board(boardConfiguration);
+
+        CSP<Board, Piece, PieceContent> problem = new MagnetPuzzleCSP(board);
+
+        CSPSolverAlgorithm<Board, Piece, PieceContent> solver = new BacktrackAlgorithm<>(problem);
+
+        solver.solve();
+
     }
 
     @Override
@@ -75,7 +97,11 @@ public class MagnetPuzzleApplication extends Application {
             boolean success = false;
             if (db.hasFiles()) {
                 dropped.setText(db.getFiles().toString());
-                readConfigFromFile(db.getFiles().get(0).getAbsolutePath());
+                try {
+                    readConfigFromFile(db.getFiles().get(0).getAbsolutePath());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 success = true;
                 btn.setDisable(false);
             }
@@ -101,49 +127,8 @@ public class MagnetPuzzleApplication extends Application {
         return layout;
     }
 
-    private void readConfigFromFile(String pathFile) {
-        try {
-            File myObj = new File(pathFile);
-            Scanner myReader = new Scanner(myObj);
-            while (myReader.hasNextLine()) {
-                int row_num = myReader.nextInt();
-                int col_num = myReader.nextInt();
-                int[] positiveRows = new int[row_num];
-                int[] negativeRows = new int[row_num];
-                int[] positiveCols = new int[row_num];
-                int[] negativeCols = new int[row_num];
-                int[][] tileIds = new int[row_num][col_num];
-                BoardConfiguration boardConfig = new BoardConfiguration();
-                for (int i = 0; i < row_num; i++)
-                    positiveRows[i] = myReader.nextInt();
-
-                for (int i = 0; i < row_num; i++)
-                    negativeRows[i] = myReader.nextInt();
-
-                for (int i = 0; i < col_num; i++)
-                    positiveCols[i] = myReader.nextInt();
-
-                for (int i = 0; i < col_num; i++)
-                    negativeCols[i] = myReader.nextInt();
-
-                for (int i = 0; i < row_num; i++)
-                    for (int j = 0; j < col_num; j++)
-                        tileIds[i][j] = myReader.nextInt();
-
-                boardConfig.setROW_NUM(row_num);
-                boardConfig.setCOL_NUM(col_num);
-                boardConfig.setRowPositiveConstraint(positiveRows);
-                boardConfig.setRowNegativeConstraints(negativeRows);
-                boardConfig.setColPositiveConstraints(positiveCols);
-                boardConfig.setColNegativeConstraints(negativeCols);
-                boardConfig.setTileIdsForPieces(tileIds);
-                board = new Board(boardConfig);
-            }
-            myReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
+    private void readConfigFromFile(String pathFile) throws FileNotFoundException {
+        board = new Board(new FileConfigParser(pathFile).parseConfig());
     }
 
     private Parent boardScene() {

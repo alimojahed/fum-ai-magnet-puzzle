@@ -27,4 +27,13 @@ public class Piece implements Serializable {
     public Piece(Position position) {
         this.position = position;
     }
+
+    @Override
+    public String toString() {
+        return "{ (" +
+                position.getX() +
+                ", " +
+                position.getY() +
+                ")}";
+    }
 }

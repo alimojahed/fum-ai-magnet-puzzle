@@ -1,4 +1,4 @@
-package ir.fum.ai.csp.magnetpuzzle.csp.algorithm.heuristic;
+package ir.fum.ai.csp.magnetpuzzle.csp.heuristic;
 
 /**
  * @author Mahya Ehsanimehr on 12/26/2021

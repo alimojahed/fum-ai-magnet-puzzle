@@ -1,6 +1,7 @@
 package ir.fum.ai.csp.magnetpuzzle.game;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,9 +16,13 @@ import java.util.Set;
 
 
 @Getter
+@ToString
 public class Board implements Serializable {
+    @ToString.Exclude
     private BoardConfiguration boardConfiguration;
     private Piece[][] pieces;
+
+    @ToString.Exclude
     private Map<Integer, Tile> tiles = new HashMap<>();
 
 

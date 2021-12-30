@@ -7,6 +7,7 @@ import ir.fum.ai.csp.magnetpuzzle.csp.problem.Domain;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
 import ir.fum.ai.csp.magnetpuzzle.game.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * @project magnet-puzzle
  **/
 
-
+@Log4j2
 public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     private Stack<ActionHistory> actionHistories = new Stack<>();
@@ -30,7 +31,7 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     @Override
     protected void createVariablesFromProblem() {
-
+        log.info("createVariablesFromProblem");
         for (int i = 0; i < getProblem().getBoardConfiguration().getROW_NUM(); i++) {
             for (int j = 0; j < getProblem().getBoardConfiguration().getCOL_NUM(); j++) {
                 getVariables()
@@ -43,9 +44,16 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     @Override
     protected void createConstraintsFromProblem() {
+        log.info("start creating constraints");
         createTilesConstraints();
+        log.info("tile constraint created");
         createRowsAndColumnsCounterConstraint();
+        log.info("row column constraint created");
         createNeighborsHasOppositePoleConstraints();
+        log.info("neighbors constraint created");
+
+        System.out.println(getConstraints().size());
+
     }
 
     private void createTilesConstraints() {
@@ -115,12 +123,12 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
         Predicate<Board> positivePredicate = board ->
                 board.countMagnetPolesInRow(rowIndex, PieceContent.POSITIVE)
-                        < board.getBoardConfiguration().getRowPositiveConstraint()[rowIndex];
+                        == board.getBoardConfiguration().getRowPositiveConstraint()[rowIndex];
 
         Predicate<Board> negativePredicate = board ->
                 board.countMagnetPolesInRow(rowIndex, PieceContent.NEGATIVE)
-                        < board.getBoardConfiguration().getRowNegativeConstraints()[rowIndex];
-//TODO: change
+                        == board.getBoardConfiguration().getRowNegativeConstraints()[rowIndex];
+
         getConstraints().add(new Constraint<>(variables, positivePredicate));
         getConstraints().add(new Constraint<>(variables, negativePredicate));
     }
@@ -161,7 +169,7 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
     }
 
     @Override
-    protected void assignValueToVariable(PieceContent value, Piece variable) {
+    public void assignValueToVariable(PieceContent value, Piece variable) {
         Piece piece = getProblem().getPieces()[variable.getPosition().getX()][variable.getPosition().getX()];
 
         actionHistories.push(new ActionHistory(piece, getVariable(piece).getValue(), value));
@@ -173,15 +181,16 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
         getProblem().setPoleOn(piece.getPosition().getX(), piece.getPosition().getY(), value);
         getVariable(piece).setValue(value);
 
+        getAssignment().add(getVariable(piece));
     }
 
     @Override
-    protected boolean canAssignValueToVariable(PieceContent value, Piece variable) {
+    public boolean canAssignValueToVariable(PieceContent value, Piece variable) {
         return getProblem().canSetPoleOn(variable.getPosition().getX(), variable.getPosition().getY(), value);
     }
 
     @Override
-    protected void undoLastAction() {
+    public void undoLastAction() {
         if (!actionHistories.empty()) {
 
             ActionHistory lastAction = actionHistories.pop();
@@ -194,13 +203,13 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
             getVariable(lastAction.piece).setValue(lastAction.previous);
             getVariable(lastAction.piece).getDomain().addValue(lastAction.newVal);
-
+            getAssignment().remove(getVariable(lastAction.piece));
 
         }
     }
 
     @Override
-    protected boolean isProblemSolved() {
+    public boolean isProblemSolved() {
         return getProblem().isSolved();
     }
 

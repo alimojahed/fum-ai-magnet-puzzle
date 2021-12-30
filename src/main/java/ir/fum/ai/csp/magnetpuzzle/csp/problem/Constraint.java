@@ -23,4 +23,8 @@ public class Constraint<VAR_T, DOMAIN_T, LIMITER_OBJ_T> {
         return constraint.test(limiter);
     }
 
+    public boolean isAllVariableAreAssigned(LIMITER_OBJ_T limiter) {
+        return variables.stream()
+                .noneMatch(variable -> variable.getValue() == null);
+    }
 }

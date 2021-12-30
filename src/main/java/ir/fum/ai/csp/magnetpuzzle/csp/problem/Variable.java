@@ -32,4 +32,13 @@ public class Variable<VAR_T, DOMAIN_T> {
         return value != null;
     }
 
+    @Override
+    public String toString() {
+        return "{ " +
+                name.toString() +
+                " = " +
+                value +
+                " }";
+
+    }
 }
