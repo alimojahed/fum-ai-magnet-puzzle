@@ -22,4 +22,15 @@ public enum PieceContent implements Serializable {
         this.pieceContentCharacter = pieceContentCharacter;
         this.magneticPole = magneticPole;
     }
+
+    public static PieceContent getOppositePole(PieceContent pole) {
+        switch (pole) {
+            case NEGATIVE:
+                return POSITIVE;
+            case POSITIVE:
+                return NEGATIVE;
+            default:
+                return None;
+        }
+    }
 }
