@@ -25,25 +25,25 @@ public class AC3<PROBLEM_T, VAR_T, DOMAIN_T> {
 
 
     public boolean ac3() {
-        Queue<Arc<VAR_T, DOMAIN_T>> arcs = getArcsFromConstraint(csp);
+        Queue<Arc<VAR_T, DOMAIN_T>> arcs = getArcsFromConstraint();
 
         boolean inConsistent = false;
         while (!arcs.isEmpty() && !inConsistent) {
             Arc<VAR_T, DOMAIN_T> arc = arcs.poll();
 
-            if (revise(csp, arc)) {
+            if (revise(arc)) {
 
                 if (arc.var1.getDomain().getLegalValues().isEmpty()) {
                     inConsistent = true;
                 }
-                arcs.addAll(getArcsOfRevisedVariable(csp, arc.var1, arc.var2));
+                arcs.addAll(getArcsOfRevisedVariable(arc.var1, arc.var2));
             }
         }
 
         return inConsistent;
     }
 
-    private boolean revise(CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp, Arc<VAR_T, DOMAIN_T> arc) {
+    private boolean revise(Arc<VAR_T, DOMAIN_T> arc) {
         boolean revise = false;
         for (DOMAIN_T value : arc.var1.getDomain().getLegalValues()) {
             csp.assignValueToVariable(value, arc.var1.getName());
@@ -65,7 +65,7 @@ public class AC3<PROBLEM_T, VAR_T, DOMAIN_T> {
     }
 
 
-    private Queue<Arc<VAR_T, DOMAIN_T>> getArcsFromConstraint(CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp) {
+    private Queue<Arc<VAR_T, DOMAIN_T>> getArcsFromConstraint() {
         Queue<Arc<VAR_T, DOMAIN_T>> queue = new LinkedList<>();
 
         for (Constraint<VAR_T, DOMAIN_T, PROBLEM_T> constraint : csp.getConstraintsOfOrder(2)) {
@@ -76,8 +76,7 @@ public class AC3<PROBLEM_T, VAR_T, DOMAIN_T> {
         return queue;
     }
 
-    private List<Arc<VAR_T, DOMAIN_T>> getArcsOfRevisedVariable(CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp,
-                                                                Variable<VAR_T, DOMAIN_T> origin,
+    private List<Arc<VAR_T, DOMAIN_T>> getArcsOfRevisedVariable(Variable<VAR_T, DOMAIN_T> origin,
                                                                 Variable<VAR_T, DOMAIN_T> except) {
         List<Arc<VAR_T, DOMAIN_T>> arcsFromVariable = new ArrayList<>();
 

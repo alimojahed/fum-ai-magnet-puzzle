@@ -37,7 +37,7 @@ public class Test {
 
     private static void solveGame() throws FileNotFoundException {
         System.out.println("hello");
-        BoardConfiguration boardConfiguration = new FileConfigParser("input1_method2.txt").parseConfig();
+        BoardConfiguration boardConfiguration = new FileConfigParser("test_case1.txt").parseConfig();
         System.out.println("hello");
         System.out.println(boardConfiguration);
         Board board = new Board(boardConfiguration);
