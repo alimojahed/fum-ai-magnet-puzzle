@@ -6,7 +6,9 @@ import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
 import ir.fum.ai.csp.magnetpuzzle.csp.solver.CSPSolverAlgorithm;
 import lombok.extern.log4j.Log4j2;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,7 +48,7 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
 
         Variable<VAR_T, DOMAIN_T> variable = pickUnAssignedVariable();
 
-        for (DOMAIN_T value : variable.getDomain().getLegalValues()) {
+        for (DOMAIN_T value : getOrderedValues(variable)) {
             if (done)
                 break;
             boolean canAssignThisVariable = true;
@@ -89,9 +91,8 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
     }
 
     @Override
-    public DOMAIN_T pickValue() {
-        //not used in this algorithm
-        return null;
+    public List<DOMAIN_T> getOrderedValues(Variable<VAR_T, DOMAIN_T> variable) {
+        return new ArrayList<>(variable.getDomain().getLegalValues());
     }
 
 

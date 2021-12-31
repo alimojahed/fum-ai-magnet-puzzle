@@ -30,6 +30,10 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
                 if (value == PieceContent.None) {
                     int row = variable.getName().getPosition().getX();
                     int col = variable.getName().getPosition().getY();
+
+                    int totalCol = csp.getProblem().getBoardConfiguration().getCOL_NUM();
+                    int totalRow = csp.getProblem().getBoardConfiguration().getROW_NUM();
+
                     int countNonePoleVariablesInRow = countVariablesWithPoleInRow(csp, row, PieceContent.None);
 
                     int countNonePoleVariableInCol = countVariablesWithPoleInCol(csp, col, PieceContent.None);
@@ -40,9 +44,7 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
                     int sumOfColConstraint = csp.getProblem().getBoardConfiguration().getColPositiveConstraints()[col] +
                             csp.getProblem().getBoardConfiguration().getColNegativeConstraints()[col];
 
-                    if (countNonePoleVariableInCol < sumOfColConstraint && countNonePoleVariablesInRow < sumOfRowConstraint) {
-                        valueMark.put(PieceContent.None, -1);
-                    } else {
+                    if (countNonePoleVariableInCol < totalCol - sumOfColConstraint && countNonePoleVariablesInRow < totalRow - sumOfRowConstraint) {
                         valueMark.put(PieceContent.None, Integer.MAX_VALUE);
                     }
 
@@ -61,11 +63,14 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
                     }
 
                     valueMark.put(value, inConsistencyCounter);
+
                 }
             }
         }
-
-        return new ArrayList<>(Util.sortByValue(valueMark).keySet());
+        System.out.println(variable + " " + new ArrayList<>(Util.sortByValue(valueMark).keySet()));
+        List<PieceContent> orderedValues = new ArrayList<>(Util.sortByValue(valueMark).keySet());
+//        Collections.reverse(orderedValues);
+        return orderedValues;
     }
 
 
@@ -99,7 +104,7 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
         int counter = 0;
 
         for (PieceContent value : variable.getDomain().getLegalValues()) {
-            if (!csp.canAssignValueToVariable(value, variable.getName())) {
+            if (csp.canAssignValueToVariable(value, variable.getName())) {
                 counter++;
             }
         }

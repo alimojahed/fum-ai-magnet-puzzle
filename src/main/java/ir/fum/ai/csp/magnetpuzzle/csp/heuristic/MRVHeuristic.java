@@ -15,17 +15,21 @@ public class MRVHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> implements VariablePickerH
         Map<Variable<VAR_T, DOMAIN_T>, Integer> legalValuesCounter = new HashMap<>();
         Set<Integer> legalValuesDuplicationTracker = new HashSet<>();
         for (Variable<VAR_T, DOMAIN_T> variable : csp.getVariables()) {
-            legalValuesCounter.put(variable, variable.getDomain().getLegalValues().size());
-            legalValuesDuplicationTracker.add(variable.getDomain().getLegalValues().size());
+            if (!variable.isAssigned()) {
+                legalValuesCounter.put(variable, variable.getDomain().getLegalValues().size());
+                legalValuesDuplicationTracker.add(variable.getDomain().getLegalValues().size());
+            }
         }
 
         Variable<VAR_T, DOMAIN_T> variable = null;
 
-        if (legalValuesDuplicationTracker.size() > 1 || csp.getVariables().size() == 1) {
+        if (legalValuesDuplicationTracker.size() > 1 || csp.getAssignment().size() == csp.getVariables().size() - 1) {
             variable = legalValuesCounter.entrySet().stream()
                     .min(Comparator.comparing(Map.Entry::getValue))
                     .get()
                     .getKey();
+        } else {
+//            System.out.println(legalValuesDuplicationTracker);
         }
 
         return variable;

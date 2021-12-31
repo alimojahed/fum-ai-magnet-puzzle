@@ -71,7 +71,7 @@ public class Board implements Serializable {
 
     public int countMagnetPolesInRow(int row, PieceContent pole) {
         int count = 0;
-        for (int j = 0; j < boardConfiguration.getROW_NUM(); j++) {
+        for (int j = 0; j < boardConfiguration.getCOL_NUM(); j++) {
             if (pieces[row][j].getContent() == pole) {
                 count++;
             }
