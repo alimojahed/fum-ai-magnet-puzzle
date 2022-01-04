@@ -4,6 +4,8 @@ import ir.fum.ai.csp.magnetpuzzle.csp.heuristic.DegreeHeuristic;
 import ir.fum.ai.csp.magnetpuzzle.csp.heuristic.MRVHeuristic;
 import ir.fum.ai.csp.magnetpuzzle.csp.heuristic.ValuePickerHeuristic;
 import ir.fum.ai.csp.magnetpuzzle.csp.inference.ForwardChecking;
+import ir.fum.ai.csp.magnetpuzzle.csp.inference.InferenceAlgorithm;
+import ir.fum.ai.csp.magnetpuzzle.csp.inference.MACAlgorithm;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Constraint;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
@@ -21,13 +23,15 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
     private DegreeHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> degreeHeuristic = new DegreeHeuristic<>();
     private MRVHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> mrvHeuristic = new MRVHeuristic<>();
     private ValuePickerHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> valuePicker;
-    private ForwardChecking<PROBLEM_T, VAR_T, DOMAIN_T> forwardChecking;
+    private InferenceAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> forwardChecking;
+    private InferenceAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> macAlgorithm;
     private CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp;
     private boolean done = false;
 
     public HeuristicBacktrackAlgorithm(CSP<PROBLEM_T, VAR_T, DOMAIN_T> csp, ValuePickerHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> valuePicker) {
         super(csp);
         this.forwardChecking = new ForwardChecking<>(csp);
+        this.macAlgorithm = new MACAlgorithm<>(csp);
         this.valuePicker = valuePicker;
         this.csp = csp;
     }
@@ -41,6 +45,7 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 //        }
 //        tracker.add(csp.getAssignment().toString());
 
+        System.out.println(level);
 
         if (csp.getAssignment().size() == csp.getVariables().size()) {
             if (csp.isProblemSolved()) {
@@ -62,7 +67,8 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 
             csp.assignValueToVariable(value, variable.getName());
 
-            forwardChecking.inference(variable);
+//            forwardChecking.inference(variable);
+            macAlgorithm.inference(variable);
 
             for (Constraint<VAR_T, DOMAIN_T, PROBLEM_T> constraint : csp.getConstraintsOfVariable(variable)) {
                 if (constraint.isAllVariableAreAssigned(csp.getProblem())
@@ -77,7 +83,8 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 
             if (!canAssignThisVariable || !done) {
                 csp.undoLastAction();
-                forwardChecking.undoInference();
+//                forwardChecking.undoInference();
+                macAlgorithm.undoInference();
             }
 
         }
@@ -94,7 +101,7 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
         }
 
         if (variable == null) {
-            System.out.println("value picker by random");
+//            System.out.println("value picker by random");
             variable = super.pickUnAssignedVariable();
         }
 

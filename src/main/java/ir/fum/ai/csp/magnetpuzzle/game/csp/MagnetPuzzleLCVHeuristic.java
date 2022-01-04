@@ -9,10 +9,7 @@ import ir.fum.ai.csp.magnetpuzzle.game.Piece;
 import ir.fum.ai.csp.magnetpuzzle.game.PieceContent;
 import ir.fum.ai.csp.magnetpuzzle.util.Util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Ali Mojahed on 12/30/2021
@@ -67,9 +64,9 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
                 }
             }
         }
-        System.out.println(variable + " " + new ArrayList<>(Util.sortByValue(valueMark).keySet()));
+//        System.out.println(variable + " " + new ArrayList<>(Util.sortByValue(valueMark).keySet()));
         List<PieceContent> orderedValues = new ArrayList<>(Util.sortByValue(valueMark).keySet());
-//        Collections.reverse(orderedValues);
+        Collections.reverse(orderedValues);
         return orderedValues;
     }
 

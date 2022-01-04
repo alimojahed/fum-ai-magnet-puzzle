@@ -175,9 +175,7 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
         actionHistories.push(new ActionHistory(piece, getVariable(piece).getValue(), value));
 
-        if (getVariable(piece).getValue() != null) {
-            getVariable(piece).getDomain().removeValue(value);
-        }
+        getVariable(piece).getDomain().removeValue(value);
 
         getProblem().setPoleOn(piece.getPosition().getX(), piece.getPosition().getY(), value);
         getVariable(piece).setValue(value);
