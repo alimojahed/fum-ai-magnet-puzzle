@@ -45,7 +45,7 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 //        }
 //        tracker.add(csp.getAssignment().toString());
 
-        System.out.println(level);
+//        System.out.println(level);
 
         if (csp.getAssignment().size() == csp.getVariables().size()) {
             if (csp.isProblemSolved()) {
@@ -67,8 +67,8 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 
             csp.assignValueToVariable(value, variable.getName());
 
-//            forwardChecking.inference(variable);
-            macAlgorithm.inference(variable);
+            forwardChecking.inference(variable);
+//            macAlgorithm.inference(variable);
 
             for (Constraint<VAR_T, DOMAIN_T, PROBLEM_T> constraint : csp.getConstraintsOfVariable(variable)) {
                 if (constraint.isAllVariableAreAssigned(csp.getProblem())
@@ -83,8 +83,8 @@ public class HeuristicBacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> extends Bac
 
             if (!canAssignThisVariable || !done) {
                 csp.undoLastAction();
-//                forwardChecking.undoInference();
-                macAlgorithm.undoInference();
+                forwardChecking.undoInference();
+//                macAlgorithm.undoInference();
             }
 
         }
