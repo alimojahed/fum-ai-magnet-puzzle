@@ -4,9 +4,9 @@ import ir.fum.ai.csp.magnetpuzzle.csp.heuristic.ValuePickerHeuristic;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Constraint;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.Variable;
-import ir.fum.ai.csp.magnetpuzzle.game.Board;
-import ir.fum.ai.csp.magnetpuzzle.game.Piece;
-import ir.fum.ai.csp.magnetpuzzle.game.PieceContent;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleBoard;
+import ir.fum.ai.csp.magnetpuzzle.game.Pole;
+import ir.fum.ai.csp.magnetpuzzle.game.PoleContent;
 import ir.fum.ai.csp.magnetpuzzle.util.Util;
 
 import java.util.*;
@@ -15,40 +15,40 @@ import java.util.*;
  * @author Ali Mojahed on 12/30/2021
  * @project magnet-puzzle
  **/
-public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Piece, PieceContent> {
+public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<MagnetPuzzleBoard, Pole, PoleContent> {
 
 
     @Override
-    public List<PieceContent> orderValues(CSP<Board, Piece, PieceContent> csp,
-                                          Variable<Piece, PieceContent> variable) {
-        Map<PieceContent, Integer> valueMark = new HashMap<>();
-        for (PieceContent value : variable.getDomain().getLegalValues()) {
+    public List<PoleContent> orderValues(CSP<MagnetPuzzleBoard, Pole, PoleContent> csp,
+                                         Variable<Pole, PoleContent> variable) {
+        Map<PoleContent, Integer> valueMark = new HashMap<>();
+        for (PoleContent value : variable.getDomain().getLegalValues()) {
             if (csp.canAssignValueToVariable(value, variable.getName())) {
-                if (value == PieceContent.None) {
+                if (value == PoleContent.None) {
                     int row = variable.getName().getPosition().getX();
                     int col = variable.getName().getPosition().getY();
 
-                    int totalCol = csp.getProblem().getBoardConfiguration().getCOL_NUM();
-                    int totalRow = csp.getProblem().getBoardConfiguration().getROW_NUM();
+                    int totalCol = csp.getProblem().getMagnetPuzzleConfiguration().getCOL_NUM();
+                    int totalRow = csp.getProblem().getMagnetPuzzleConfiguration().getROW_NUM();
 
-                    int countNonePoleVariablesInRow = countVariablesWithPoleInRow(csp, row, PieceContent.None);
+                    int countNonePoleVariablesInRow = countVariablesWithPoleInRow(csp, row, PoleContent.None);
 
-                    int countNonePoleVariableInCol = countVariablesWithPoleInCol(csp, col, PieceContent.None);
+                    int countNonePoleVariableInCol = countVariablesWithPoleInCol(csp, col, PoleContent.None);
 
-                    int sumOfRowConstraint = csp.getProblem().getBoardConfiguration().getRowPositiveConstraint()[row] +
-                            csp.getProblem().getBoardConfiguration().getRowNegativeConstraints()[row];
+                    int sumOfRowConstraint = csp.getProblem().getMagnetPuzzleConfiguration().getRowPositiveConstraint()[row] +
+                            csp.getProblem().getMagnetPuzzleConfiguration().getRowNegativeConstraints()[row];
 
-                    int sumOfColConstraint = csp.getProblem().getBoardConfiguration().getColPositiveConstraints()[col] +
-                            csp.getProblem().getBoardConfiguration().getColNegativeConstraints()[col];
+                    int sumOfColConstraint = csp.getProblem().getMagnetPuzzleConfiguration().getColPositiveConstraints()[col] +
+                            csp.getProblem().getMagnetPuzzleConfiguration().getColNegativeConstraints()[col];
 
                     if (countNonePoleVariableInCol < totalCol - sumOfColConstraint && countNonePoleVariablesInRow < totalRow - sumOfRowConstraint) {
-                        valueMark.put(PieceContent.None, Integer.MAX_VALUE);
+                        valueMark.put(PoleContent.None, Integer.MAX_VALUE);
                     }
 
                 } else {
                     int inConsistencyCounter = 0;
-                    for (Constraint<Piece, PieceContent, Board> constraint : csp.getConstraintsOfVariable(variable)) {
-                        for (Variable<Piece, PieceContent> neighbor : constraint.getVariables()) {
+                    for (Constraint<Pole, PoleContent, MagnetPuzzleBoard> constraint : csp.getConstraintsOfVariable(variable)) {
+                        for (Variable<Pole, PoleContent> neighbor : constraint.getVariables()) {
                             if (!variable.isAssigned()) {
                                 csp.assignValueToVariable(value, variable.getName());
 
@@ -65,16 +65,16 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
             }
         }
 //        System.out.println(variable + " " + new ArrayList<>(Util.sortByValue(valueMark).keySet()));
-        List<PieceContent> orderedValues = new ArrayList<>(Util.sortByValue(valueMark).keySet());
+        List<PoleContent> orderedValues = new ArrayList<>(Util.sortByValue(valueMark).keySet());
         Collections.reverse(orderedValues);
         return orderedValues;
     }
 
 
-    private int countVariablesWithPoleInRow(CSP<Board, Piece, PieceContent> csp, int row, PieceContent pole) {
+    private int countVariablesWithPoleInRow(CSP<MagnetPuzzleBoard, Pole, PoleContent> csp, int row, PoleContent pole) {
         int counter = 0;
-        for (int j = 0; j < csp.getProblem().getBoardConfiguration().getCOL_NUM(); j++) {
-            Variable<Piece, PieceContent> variable = csp.getVariable(csp.getProblem().getPieceByPos(row, j));
+        for (int j = 0; j < csp.getProblem().getMagnetPuzzleConfiguration().getCOL_NUM(); j++) {
+            Variable<Pole, PoleContent> variable = csp.getVariable(csp.getProblem().getPieceByPos(row, j));
             if (variable.isAssigned() && variable.getValue() == pole) {
                 counter++;
             }
@@ -84,10 +84,10 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
     }
 
 
-    private int countVariablesWithPoleInCol(CSP<Board, Piece, PieceContent> csp, int col, PieceContent pole) {
+    private int countVariablesWithPoleInCol(CSP<MagnetPuzzleBoard, Pole, PoleContent> csp, int col, PoleContent pole) {
         int counter = 0;
-        for (int i = 0; i < csp.getProblem().getBoardConfiguration().getROW_NUM(); i++) {
-            Variable<Piece, PieceContent> variable = csp.getVariable(csp.getProblem().getPieceByPos(i, col));
+        for (int i = 0; i < csp.getProblem().getMagnetPuzzleConfiguration().getROW_NUM(); i++) {
+            Variable<Pole, PoleContent> variable = csp.getVariable(csp.getProblem().getPieceByPos(i, col));
             if (variable.isAssigned() && variable.getValue() == pole) {
                 counter++;
             }
@@ -96,11 +96,11 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<Board, Pie
         return counter;
     }
 
-    private int getNumberOfInConsistentValues(Variable<Piece, PieceContent> variable,
-                                              CSP<Board, Piece, PieceContent> csp) {
+    private int getNumberOfInConsistentValues(Variable<Pole, PoleContent> variable,
+                                              CSP<MagnetPuzzleBoard, Pole, PoleContent> csp) {
         int counter = 0;
 
-        for (PieceContent value : variable.getDomain().getLegalValues()) {
+        for (PoleContent value : variable.getDomain().getLegalValues()) {
             if (csp.canAssignValueToVariable(value, variable.getName())) {
                 counter++;
             }

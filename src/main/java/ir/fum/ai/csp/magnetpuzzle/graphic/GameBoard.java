@@ -1,7 +1,7 @@
 package ir.fum.ai.csp.magnetpuzzle.graphic;
 
-import ir.fum.ai.csp.magnetpuzzle.game.Board;
-import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleBoard;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -15,14 +15,14 @@ import javafx.scene.shape.Rectangle;
  **/
 public class GameBoard extends StackPane {
     private static int CELL_SIZE = 50;
-    private Board board;
+    private MagnetPuzzleBoard magnetPuzzleBoard;
     private int col, row;
     private Cell[][] cells;
 
-    public GameBoard(Board board) {
-        this.board = board;
-        this.row = board.getBoardConfiguration().getROW_NUM() + 2;
-        this.col = board.getBoardConfiguration().getCOL_NUM() + 2;
+    public GameBoard(MagnetPuzzleBoard magnetPuzzleBoard) {
+        this.magnetPuzzleBoard = magnetPuzzleBoard;
+        this.row = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getROW_NUM() + 2;
+        this.col = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getCOL_NUM() + 2;
         cells = new Cell[this.row][this.col];
         VBox boardBox = new VBox();
         for (int i = 0; i < this.row; i++) {
@@ -41,7 +41,7 @@ public class GameBoard extends StackPane {
     }
 
     private void setConstraintsOnBoard() {
-        BoardConfiguration config = board.getBoardConfiguration();
+        MagnetPuzzleConfiguration config = magnetPuzzleBoard.getMagnetPuzzleConfiguration();
         cells[0][0].setLabel("+");
         cells[row - 1][col - 1].setLabel("-");
         cells[0][col - 1].setLabel("#");
@@ -61,7 +61,7 @@ public class GameBoard extends StackPane {
     }
 
     private void setValuesOnBoard() {
-        BoardConfiguration config = board.getBoardConfiguration();
+        MagnetPuzzleConfiguration config = magnetPuzzleBoard.getMagnetPuzzleConfiguration();
         for (int i = 1; i < row - 1; i++) {
             for (int j = 1; j < col - 1; j++) {
                 cells[i][j].setValue(config.getTileIdsForPieces()[i - 1][j - 1]);

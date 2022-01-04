@@ -15,30 +15,30 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Tile implements Serializable {
+public class Magnet implements Serializable {
     @EqualsAndHashCode.Include
     private int tileId;
 
     @EqualsAndHashCode.Include
-    private Piece first;
+    private Pole first;
 
     @EqualsAndHashCode.Include
-    private Piece second;
+    private Pole second;
 
     @EqualsAndHashCode.Include
-    private TileStatus tileStatus;
+    private MagnetStatus magnetStatus;
 
-    public Tile(int tileId) {
+    public Magnet(int tileId) {
         this.tileId = tileId;
     }
 
-    public void setFirst(Piece first) {
+    public void setFirst(Pole first) {
         this.first = first;
-        first.setTile(this);
+        first.setMagnet(this);
     }
 
-    public void setSecond(Piece second) {
+    public void setSecond(Pole second) {
         this.second = second;
-        second.setTile(this);
+        second.setMagnet(this);
     }
 }

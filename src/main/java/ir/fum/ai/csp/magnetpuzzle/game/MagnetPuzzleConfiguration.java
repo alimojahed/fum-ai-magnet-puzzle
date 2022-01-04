@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class BoardConfiguration implements Serializable {
+public class MagnetPuzzleConfiguration implements Serializable {
     private int[] rowPositiveConstraint;
     private int[] rowNegativeConstraints;
     private int[] colPositiveConstraints;

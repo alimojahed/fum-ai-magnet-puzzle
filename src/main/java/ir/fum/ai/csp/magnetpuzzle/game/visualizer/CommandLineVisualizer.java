@@ -1,7 +1,7 @@
 package ir.fum.ai.csp.magnetpuzzle.game.visualizer;
 
-import ir.fum.ai.csp.magnetpuzzle.game.Board;
-import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleBoard;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
 
 /**
  * @author Mahya Ehsanimehr on 12/24/2021
@@ -9,10 +9,10 @@ import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
  **/
 public class CommandLineVisualizer implements Visualizer {
     @Override
-    public void visualizeBoard(Board board) {
-        int rows = board.getBoardConfiguration().getROW_NUM();
-        int cols = board.getBoardConfiguration().getCOL_NUM();
-        String[][] boardArray = makeBoardArray(board);
+    public void visualizeBoard(MagnetPuzzleBoard magnetPuzzleBoard) {
+        int rows = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getROW_NUM();
+        int cols = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getCOL_NUM();
+        String[][] boardArray = makeBoardArray(magnetPuzzleBoard);
         for (int i = 0; i < rows + 2; i++) {
             for (int j = 0; j < cols + 2; j++) {
                 // incomplete
@@ -23,8 +23,8 @@ public class CommandLineVisualizer implements Visualizer {
 
     }
 
-    private String[][] makeBoardArray(Board board) {
-        BoardConfiguration config = board.getBoardConfiguration();
+    private String[][] makeBoardArray(MagnetPuzzleBoard magnetPuzzleBoard) {
+        MagnetPuzzleConfiguration config = magnetPuzzleBoard.getMagnetPuzzleConfiguration();
         String[][] boardArr = new String[config.getROW_NUM() + 2][config.getCOL_NUM() + 2];
         boardArr[0][0] = "+";
         boardArr[0][1] = " ";

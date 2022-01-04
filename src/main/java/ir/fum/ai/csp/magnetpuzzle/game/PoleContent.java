@@ -10,7 +10,7 @@ import java.io.Serializable;
  **/
 
 @Getter
-public enum PieceContent implements Serializable {
+public enum PoleContent implements Serializable {
     None("0", 0),
     POSITIVE("+", 1),
     NEGATIVE("-", -1);
@@ -18,12 +18,12 @@ public enum PieceContent implements Serializable {
     private final String pieceContentCharacter;
     private final int magneticPole;
 
-    PieceContent(String pieceContentCharacter, int magneticPole) {
+    PoleContent(String pieceContentCharacter, int magneticPole) {
         this.pieceContentCharacter = pieceContentCharacter;
         this.magneticPole = magneticPole;
     }
 
-    public static PieceContent getOppositePole(PieceContent pole) {
+    public static PoleContent getOppositePole(PoleContent pole) {
         switch (pole) {
             case NEGATIVE:
                 return POSITIVE;

@@ -4,10 +4,10 @@ import ir.fum.ai.csp.magnetpuzzle.config.reader.FileConfigParser;
 import ir.fum.ai.csp.magnetpuzzle.csp.algorithm.BacktrackAlgorithm;
 import ir.fum.ai.csp.magnetpuzzle.csp.problem.CSP;
 import ir.fum.ai.csp.magnetpuzzle.csp.solver.CSPSolverAlgorithm;
-import ir.fum.ai.csp.magnetpuzzle.game.Board;
-import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
-import ir.fum.ai.csp.magnetpuzzle.game.Piece;
-import ir.fum.ai.csp.magnetpuzzle.game.PieceContent;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleBoard;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.Pole;
+import ir.fum.ai.csp.magnetpuzzle.game.PoleContent;
 import ir.fum.ai.csp.magnetpuzzle.game.csp.MagnetPuzzleCSP;
 import ir.fum.ai.csp.magnetpuzzle.graphic.GameBoard;
 import javafx.application.Application;
@@ -37,7 +37,7 @@ import java.io.FileNotFoundException;
  **/
 @Log4j2
 public class MagnetPuzzleApplication extends Application {
-    private Board board;
+    private MagnetPuzzleBoard magnetPuzzleBoard;
     private Stage mainStage;
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -48,13 +48,13 @@ public class MagnetPuzzleApplication extends Application {
     }
 
     private static void solveGame() throws FileNotFoundException {
-        BoardConfiguration boardConfiguration = new FileConfigParser("input1_method2.txt").parseConfig();
+        MagnetPuzzleConfiguration magnetPuzzleConfiguration = new FileConfigParser("input1_method2.txt").parseConfig();
 
-        Board board = new Board(boardConfiguration);
+        MagnetPuzzleBoard magnetPuzzleBoard = new MagnetPuzzleBoard(magnetPuzzleConfiguration);
 
-        CSP<Board, Piece, PieceContent> problem = new MagnetPuzzleCSP(board);
+        CSP<MagnetPuzzleBoard, Pole, PoleContent> problem = new MagnetPuzzleCSP(magnetPuzzleBoard);
 
-        CSPSolverAlgorithm<Board, Piece, PieceContent> solver = new BacktrackAlgorithm<>(problem);
+        CSPSolverAlgorithm<MagnetPuzzleBoard, Pole, PoleContent> solver = new BacktrackAlgorithm<>(problem);
 
         solver.solve();
 
@@ -128,12 +128,12 @@ public class MagnetPuzzleApplication extends Application {
     }
 
     private void readConfigFromFile(String pathFile) throws FileNotFoundException {
-        board = new Board(new FileConfigParser(pathFile).parseConfig());
+        magnetPuzzleBoard = new MagnetPuzzleBoard(new FileConfigParser(pathFile).parseConfig());
     }
 
     private Parent boardScene() {
         // board
-        GameBoard graphicalBoard = new GameBoard(board);
+        GameBoard graphicalBoard = new GameBoard(magnetPuzzleBoard);
         HBox boardBox = new HBox();
         boardBox.getChildren().add(graphicalBoard);
         boardBox.setAlignment(Pos.CENTER);
