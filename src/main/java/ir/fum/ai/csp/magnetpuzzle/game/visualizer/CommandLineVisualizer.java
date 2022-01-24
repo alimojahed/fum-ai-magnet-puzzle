@@ -2,6 +2,8 @@ package ir.fum.ai.csp.magnetpuzzle.game.visualizer;
 
 import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleBoard;
 import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetStatus;
+import ir.fum.ai.csp.magnetpuzzle.game.Pole;
 
 /**
  * @author Mahya Ehsanimehr on 12/24/2021
@@ -10,17 +12,131 @@ import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
 public class CommandLineVisualizer implements Visualizer {
     @Override
     public void visualizeBoard(MagnetPuzzleBoard magnetPuzzleBoard) {
+
         int rows = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getROW_NUM();
         int cols = magnetPuzzleBoard.getMagnetPuzzleConfiguration().getCOL_NUM();
-        String[][] boardArray = makeBoardArray(magnetPuzzleBoard);
-        for (int i = 0; i < rows + 2; i++) {
-            for (int j = 0; j < cols + 2; j++) {
-                // incomplete
-                System.out.print(boardArray[i][j] + " | ");
+
+        String VERTICAL_WALL = "\u2503";
+        String HORIZONTAL_WALL = "\u2501";
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("\n");
+        stringBuilder.append(VERTICAL_WALL);
+        for (int i=0; i < rows-1; i++) {
+            stringBuilder.append(HORIZONTAL_WALL).append(" ");
+
+            if (i != rows -2) {
+                stringBuilder.append(HORIZONTAL_WALL);
             }
-            System.out.println("\n--------------------------");
+
+        }
+        stringBuilder
+                .append(HORIZONTAL_WALL)
+                .append(VERTICAL_WALL);
+        stringBuilder.append("\n");
+
+        stringBuilder
+                .append(VERTICAL_WALL)
+                .append("+")
+                .append(" ")
+                .append(" ")
+                .append(VERTICAL_WALL);
+
+
+        for (int i=0; i < rows; i++) {
+            stringBuilder.append(magnetPuzzleBoard.getMagnetPuzzleConfiguration().getColNegativeConstraints()[i])
+                    .append(VERTICAL_WALL);
         }
 
+
+        stringBuilder.append("\n");
+
+        stringBuilder.append(VERTICAL_WALL);
+        for (int i=0; i < rows-1; i++) {
+            stringBuilder.append(HORIZONTAL_WALL).append(" ");
+
+            if (i != rows -2) {
+                stringBuilder.append(HORIZONTAL_WALL);
+            }
+
+        }
+        stringBuilder.append(HORIZONTAL_WALL)
+                .append(VERTICAL_WALL);
+        stringBuilder.append("\n");
+
+        stringBuilder
+                .append(VERTICAL_WALL)
+                .append(" ")
+                .append(VERTICAL_WALL)
+                .append("-")
+                .append(VERTICAL_WALL);
+
+        for (int i=0; i < rows; i++) {
+            stringBuilder.append(magnetPuzzleBoard.getMagnetPuzzleConfiguration().getColNegativeConstraints()[i])
+                    .append(VERTICAL_WALL);
+        }
+        stringBuilder.append("\n");
+        stringBuilder.append(VERTICAL_WALL);
+        for (int i=0; i < rows-1; i++) {
+            stringBuilder.append(HORIZONTAL_WALL).append(" ");
+
+            if (i != rows -2) {
+                stringBuilder.append(HORIZONTAL_WALL);
+            }
+
+        }
+        stringBuilder
+                .append(HORIZONTAL_WALL)
+                .append(VERTICAL_WALL);
+        stringBuilder.append("\n");
+
+        for (int i = 0; i < rows; i++) {
+            stringBuilder
+                    .append(VERTICAL_WALL)
+                    .append(magnetPuzzleBoard.getMagnetPuzzleConfiguration().getRowPositiveConstraint()[i])
+                    .append(VERTICAL_WALL)
+                    .append(magnetPuzzleBoard.getMagnetPuzzleConfiguration().getRowNegativeConstraints()[i])
+                    .append(VERTICAL_WALL);
+
+            for (int j = 0; j < cols; j++) {
+                Pole pole = magnetPuzzleBoard.getPieceByPos(i, j);
+                stringBuilder.append(pole.getContent().getPieceContentCharacter());
+                if (pole.getMagnet().getMagnetStatus() == MagnetStatus.HORIZONTAL && pole.getMagnet().getSecond().equals(pole)) {
+                    stringBuilder.append(VERTICAL_WALL);
+                } else if (pole.getMagnet().getMagnetStatus() == MagnetStatus.VERTICAL) {
+                    stringBuilder.append(VERTICAL_WALL);
+                }else {
+                    stringBuilder.append(" ");
+                }
+
+            }
+            stringBuilder.append("\n");
+            stringBuilder.append(VERTICAL_WALL);
+            stringBuilder.append(HORIZONTAL_WALL).append(" ");
+            stringBuilder.append(HORIZONTAL_WALL).append(" ");
+            for (int j=0; j <cols;j++) {
+                Pole pole = magnetPuzzleBoard.getPieceByPos(i, j);
+                if (pole.getMagnet().getMagnetStatus() == MagnetStatus.VERTICAL && pole.getMagnet().getSecond().equals(pole)) {
+                    stringBuilder.append(HORIZONTAL_WALL);
+
+                } else if (pole.getMagnet().getMagnetStatus() == MagnetStatus.HORIZONTAL) {
+                    stringBuilder.append(HORIZONTAL_WALL);
+
+                }else {
+                    stringBuilder.append(" ");
+                }
+
+                if (j != cols-1) {
+                    stringBuilder.append(" ");
+                }
+
+            }
+            stringBuilder.append(VERTICAL_WALL);
+            stringBuilder.append("\n");
+//            System.out.println("\n--------------------------");
+        }
+        System.out.println(stringBuilder.toString());
     }
 
     private String[][] makeBoardArray(MagnetPuzzleBoard magnetPuzzleBoard) {

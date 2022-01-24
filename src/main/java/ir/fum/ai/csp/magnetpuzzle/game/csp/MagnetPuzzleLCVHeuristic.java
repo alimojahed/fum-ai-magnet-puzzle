@@ -46,20 +46,20 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<MagnetPuzz
                     }
 
                 } else {
-                    int inConsistencyCounter = 0;
+                    int consistencyCounter = 0;
                     for (Constraint<Pole, PoleContent, MagnetPuzzleBoard> constraint : csp.getConstraintsOfVariable(variable)) {
                         for (Variable<Pole, PoleContent> neighbor : constraint.getVariables()) {
                             if (!variable.isAssigned()) {
                                 csp.assignValueToVariable(value, variable.getName());
 
-                                inConsistencyCounter += getNumberOfInConsistentValues(neighbor, csp);
+                                consistencyCounter += getNumberOConsistentValues(neighbor, csp);
 
                                 csp.undoLastAction();
                             }
                         }
                     }
 
-                    valueMark.put(value, inConsistencyCounter);
+                    valueMark.put(value, consistencyCounter);
 
                 }
             }
@@ -96,8 +96,8 @@ public class MagnetPuzzleLCVHeuristic implements ValuePickerHeuristic<MagnetPuzz
         return counter;
     }
 
-    private int getNumberOfInConsistentValues(Variable<Pole, PoleContent> variable,
-                                              CSP<MagnetPuzzleBoard, Pole, PoleContent> csp) {
+    private int getNumberOConsistentValues(Variable<Pole, PoleContent> variable,
+                                           CSP<MagnetPuzzleBoard, Pole, PoleContent> csp) {
         int counter = 0;
 
         for (PoleContent value : variable.getDomain().getLegalValues()) {

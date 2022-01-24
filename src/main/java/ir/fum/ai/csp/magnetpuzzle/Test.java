@@ -10,6 +10,7 @@ import ir.fum.ai.csp.magnetpuzzle.game.Pole;
 import ir.fum.ai.csp.magnetpuzzle.game.PoleContent;
 import ir.fum.ai.csp.magnetpuzzle.game.csp.MagnetPuzzleCSP;
 import ir.fum.ai.csp.magnetpuzzle.game.csp.MagnetPuzzleLCVHeuristic;
+import ir.fum.ai.csp.magnetpuzzle.game.visualizer.CommandLineVisualizer;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.FileNotFoundException;
@@ -52,7 +53,8 @@ public class Test {
         }
 
         System.out.println("executed in " + (endTime - startTime) / 1e9);
-
+        CommandLineVisualizer visualizer = new CommandLineVisualizer();
+        visualizer.visualizeBoard(magnetPuzzleBoard);
     }
 
 }

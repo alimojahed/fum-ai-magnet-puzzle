@@ -32,7 +32,7 @@ public class BacktrackAlgorithm<PROBLEM_T, VAR_T, DOMAIN_T> implements CSPSolver
     }
 
     protected void solveLevel(int level) {
-        System.out.println(csp.getAssignment());
+//        System.out.println(csp.getAssignment());
         if (csp.getAssignment().size() == csp.getVariables().size()) {
             if (csp.isProblemSolved()) {
                 System.out.println("problem solved");
