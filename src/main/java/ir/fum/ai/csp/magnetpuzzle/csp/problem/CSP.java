@@ -1,6 +1,5 @@
 package ir.fum.ai.csp.magnetpuzzle.csp.problem;
 
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -60,7 +59,7 @@ public abstract class CSP<PROBLEM_T, VAR_T, DOMAIN_T> {
     }
 
     public Set<Constraint<VAR_T, DOMAIN_T, PROBLEM_T>> getConstraintWithOrderAndVar(int order,
-                                                                                    Variable<VAR_T, DOMAIN_T> variable){
+                                                                                    Variable<VAR_T, DOMAIN_T> variable) {
         return constraints.stream()
                 .filter(constraint -> constraint.getVariables().size() == order && constraint.getVariables().contains(variable))
                 .collect(Collectors.toSet());

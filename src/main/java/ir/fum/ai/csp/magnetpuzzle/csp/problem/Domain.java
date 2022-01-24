@@ -1,10 +1,7 @@
 package ir.fum.ai.csp.magnetpuzzle.csp.problem;
 
 import com.google.common.collect.Sets;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +15,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Domain<T> {
     private Set<T> legalValues = new HashSet<>();
 

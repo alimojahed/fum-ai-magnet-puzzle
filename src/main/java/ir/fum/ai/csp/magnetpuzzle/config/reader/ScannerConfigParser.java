@@ -1,6 +1,6 @@
 package ir.fum.ai.csp.magnetpuzzle.config.reader;
 
-import ir.fum.ai.csp.magnetpuzzle.game.BoardConfiguration;
+import ir.fum.ai.csp.magnetpuzzle.game.MagnetPuzzleConfiguration;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.InputStream;
@@ -22,10 +22,10 @@ public class ScannerConfigParser implements ConfigParser {
     }
 
     @Override
-    public BoardConfiguration parseConfig() {
+    public MagnetPuzzleConfiguration parseConfig() {
         Scanner myReader = new Scanner(inputStream);
 
-        BoardConfiguration boardConfig = new BoardConfiguration();
+        MagnetPuzzleConfiguration boardConfig = new MagnetPuzzleConfiguration();
         while (myReader.hasNextLine()) {
             int row_num = myReader.nextInt();
             int col_num = myReader.nextInt();

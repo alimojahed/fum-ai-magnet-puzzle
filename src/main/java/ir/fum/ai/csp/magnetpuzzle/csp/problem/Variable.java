@@ -38,7 +38,10 @@ public class Variable<VAR_T, DOMAIN_T> {
                 name.toString() +
                 " = " +
                 value +
-                " }";
+                " , " +
+                "domain = " +
+                domain +
+                "}";
 
     }
 }

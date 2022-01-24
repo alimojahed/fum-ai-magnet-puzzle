@@ -18,25 +18,24 @@ public class DegreeHeuristic<PROBLEM_T, VAR_T, DOMAIN_T> implements VariablePick
 
         Map<Variable<VAR_T, DOMAIN_T>, Integer> variableCounter = new HashMap<>();
         for (Variable<VAR_T, DOMAIN_T> variable : csp.getVariables()) {
-            for (Constraint<VAR_T, DOMAIN_T, ?> constraint : csp.getConstraints()) {
-                int counter = 0;
-                if (constraint.getVariables().contains(variable)) {
-                    counter ++;
-                }
+            if (!variable.isAssigned()) {
+                for (Constraint<VAR_T, DOMAIN_T, ?> constraint : csp.getConstraints()) {
+                    int counter = 0;
+                    if (constraint.getVariables().contains(variable)) {
+                        counter++;
+                    }
 
-                variableCounter.put(variable, counter);
-                variableCounterDuplicationTracker.add(counter);
+                    variableCounter.put(variable, counter);
+                    variableCounterDuplicationTracker.add(counter);
+                }
             }
         }
 
+        return variableCounter.entrySet()
+                .stream()
+                .max(Comparator.comparing(Map.Entry::getValue))
+                .get()
+                .getKey();
 
-        Variable<VAR_T, DOMAIN_T> var = null;
-        if ((variableCounterDuplicationTracker.size() <= 1 && csp.getVariables().size() <= 1)) {
-            var = variableCounter.entrySet()
-                    .stream()
-                    .max(Comparator.comparing(Map.Entry::getValue)).get().getKey();
-        }
-
-        return var;
     }
 }

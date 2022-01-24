@@ -14,26 +14,26 @@ import java.io.Serializable;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Piece implements Serializable {
+public class Pole implements Serializable {
     @EqualsAndHashCode.Include
     private Position position;
 
     @EqualsAndHashCode.Exclude
-    private PieceContent content = PieceContent.None;
+    private PoleContent content = PoleContent.None;
 
     @EqualsAndHashCode.Exclude
-    private Tile tile;
+    private Magnet magnet;
 
-    public Piece(Position position) {
+    public Pole(Position position) {
         this.position = position;
     }
 
     @Override
     public String toString() {
-        return "{ (" +
+        return "(" +
                 position.getX() +
                 ", " +
                 position.getY() +
-                ")}";
+                ")";
     }
 }

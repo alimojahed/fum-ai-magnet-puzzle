@@ -6,6 +6,6 @@ import java.io.Serializable;
  * @author Ali Mojahed on 12/21/2021
  * @project magnet-puzzle
  **/
-public enum TileStatus implements Serializable {
+public enum MagnetStatus implements Serializable {
     VERTICAL, HORIZONTAL
 }

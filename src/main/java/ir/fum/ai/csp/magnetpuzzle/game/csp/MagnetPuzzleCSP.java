@@ -21,22 +21,22 @@ import java.util.stream.Collectors;
  **/
 
 @Log4j2
-public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
+public class MagnetPuzzleCSP extends CSP<MagnetPuzzleBoard, Pole, PoleContent> {
 
     private Stack<ActionHistory> actionHistories = new Stack<>();
 
-    public MagnetPuzzleCSP(Board problem) {
+    public MagnetPuzzleCSP(MagnetPuzzleBoard problem) {
         super(problem);
     }
 
     @Override
     protected void createVariablesFromProblem() {
         log.info("createVariablesFromProblem");
-        for (int i = 0; i < getProblem().getBoardConfiguration().getROW_NUM(); i++) {
-            for (int j = 0; j < getProblem().getBoardConfiguration().getCOL_NUM(); j++) {
+        for (int i = 0; i < getProblem().getMagnetPuzzleConfiguration().getROW_NUM(); i++) {
+            for (int j = 0; j < getProblem().getMagnetPuzzleConfiguration().getCOL_NUM(); j++) {
                 getVariables()
-                        .add(new Variable<>(getProblem().getPieces()[i][j],
-                                Domain.domainFromEnum(PieceContent.class, Arrays.asList(PieceContent.values())))
+                        .add(new Variable<>(getProblem().getPoles()[i][j],
+                                Domain.domainFromEnum(PoleContent.class, Arrays.asList(PoleContent.values())))
                         );
             }
         }
@@ -58,14 +58,14 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     private void createTilesConstraints() {
         for (Integer tileId : getProblem().getTiles().keySet()) {
-            Tile tile = getProblem().getTiles().get(tileId);
+            Magnet magnet = getProblem().getTiles().get(tileId);
 
-            Variable<Piece, PieceContent> first = getVariable(tile.getFirst());
-            Variable<Piece, PieceContent> second = getVariable(tile.getSecond());
+            Variable<Pole, PoleContent> first = getVariable(magnet.getFirst());
+            Variable<Pole, PoleContent> second = getVariable(magnet.getSecond());
 
-            Predicate<Board> predicate = board -> board.tilePiecesHasValidPoles(tile);
+            Predicate<MagnetPuzzleBoard> predicate = board -> board.tilePiecesHasValidPoles(magnet);
 
-            Constraint<Piece, PieceContent, Board> constraint =
+            Constraint<Pole, PoleContent, MagnetPuzzleBoard> constraint =
                     new Constraint<>(Sets.newHashSet(first, second), predicate);
 
             getConstraints().add(constraint);
@@ -73,29 +73,29 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
     }
 
     private void createRowsAndColumnsCounterConstraint() {
-        for (int i = 0; i < getProblem().getBoardConfiguration().getROW_NUM(); i++) {
+        for (int i = 0; i < getProblem().getMagnetPuzzleConfiguration().getROW_NUM(); i++) {
             createRowConstraints(i);
         }
 
-        for (int j = 0; j < getProblem().getBoardConfiguration().getCOL_NUM(); j++) {
+        for (int j = 0; j < getProblem().getMagnetPuzzleConfiguration().getCOL_NUM(); j++) {
             createColConstraints(j);
         }
 
     }
 
     private void createColConstraints(int j) {
-        Set<Piece> getPiecesInCol = getProblem().getPiecesInCol(j);
-        Set<Variable<Piece, PieceContent>> variables = getVariablesFromPieceSet(getPiecesInCol);
+        Set<Pole> getPiecesInCol = getProblem().getPiecesInCol(j);
+        Set<Variable<Pole, PoleContent>> variables = getVariablesFromPieceSet(getPiecesInCol);
 
         final int colIndex = j;
 
-        Predicate<Board> positivePredicate = board ->
-                board.countMagnetPolesInCol(colIndex, PieceContent.POSITIVE)
-                        < board.getBoardConfiguration().getColPositiveConstraints()[colIndex];
+        Predicate<MagnetPuzzleBoard> positivePredicate = board ->
+                board.countMagnetPolesInCol(colIndex, PoleContent.POSITIVE)
+                        < board.getMagnetPuzzleConfiguration().getColPositiveConstraints()[colIndex];
 
-        Predicate<Board> negativePredicate = board ->
-                board.countMagnetPolesInCol(colIndex, PieceContent.NEGATIVE)
-                        < board.getBoardConfiguration().getColNegativeConstraints()[colIndex];
+        Predicate<MagnetPuzzleBoard> negativePredicate = board ->
+                board.countMagnetPolesInCol(colIndex, PoleContent.NEGATIVE)
+                        < board.getMagnetPuzzleConfiguration().getColNegativeConstraints()[colIndex];
 
         getConstraints().add(new Constraint<>(variables, positivePredicate));
         getConstraints().add(new Constraint<>(variables, negativePredicate));
@@ -103,31 +103,31 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
     }
 
 
-    private Set<Variable<Piece, PieceContent>> getVariablesFromPieceSet(Set<Piece> pieces) {
-        return pieces.stream()
+    private Set<Variable<Pole, PoleContent>> getVariablesFromPieceSet(Set<Pole> poles) {
+        return poles.stream()
                 .map(piece -> {
                     return new Variable<>(
                             piece,
-                            Domain.domainFromEnum(PieceContent.class, Arrays.asList(PieceContent.values()))
+                            Domain.domainFromEnum(PoleContent.class, Arrays.asList(PoleContent.values()))
                     );
                 })
                 .collect(Collectors.toSet());
     }
 
     private void createRowConstraints(int i) {
-        Set<Piece> getPiecesInRow = getProblem().getPiecesInRow(i);
+        Set<Pole> getPiecesInRow = getProblem().getPiecesInRow(i);
 
-        Set<Variable<Piece, PieceContent>> variables = getVariablesFromPieceSet(getPiecesInRow);
+        Set<Variable<Pole, PoleContent>> variables = getVariablesFromPieceSet(getPiecesInRow);
 
         final int rowIndex = i;
 
-        Predicate<Board> positivePredicate = board ->
-                board.countMagnetPolesInRow(rowIndex, PieceContent.POSITIVE)
-                        == board.getBoardConfiguration().getRowPositiveConstraint()[rowIndex];
+        Predicate<MagnetPuzzleBoard> positivePredicate = board ->
+                board.countMagnetPolesInRow(rowIndex, PoleContent.POSITIVE)
+                        == board.getMagnetPuzzleConfiguration().getRowPositiveConstraint()[rowIndex];
 
-        Predicate<Board> negativePredicate = board ->
-                board.countMagnetPolesInRow(rowIndex, PieceContent.NEGATIVE)
-                        == board.getBoardConfiguration().getRowNegativeConstraints()[rowIndex];
+        Predicate<MagnetPuzzleBoard> negativePredicate = board ->
+                board.countMagnetPolesInRow(rowIndex, PoleContent.NEGATIVE)
+                        == board.getMagnetPuzzleConfiguration().getRowNegativeConstraints()[rowIndex];
 
         getConstraints().add(new Constraint<>(variables, positivePredicate));
         getConstraints().add(new Constraint<>(variables, negativePredicate));
@@ -135,8 +135,8 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     private void createNeighborsHasOppositePoleConstraints() {
 
-        final int ROWS_NUM = getProblem().getBoardConfiguration().getROW_NUM();
-        final int COLS_NUM = getProblem().getBoardConfiguration().getCOL_NUM();
+        final int ROWS_NUM = getProblem().getMagnetPuzzleConfiguration().getROW_NUM();
+        final int COLS_NUM = getProblem().getMagnetPuzzleConfiguration().getCOL_NUM();
 
         for (int i = 0; i < ROWS_NUM; i++) {
             for (int j = 0; j < COLS_NUM; j++) {
@@ -153,13 +153,13 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
     }
 
     private void createConstraintOnNeighbor(int currentX, int currentY, int neighborX, int neighborY) {
-        Set<Piece> pieces = Sets.newHashSet(getProblem().getPieceByPos(currentX, currentY),
+        Set<Pole> poles = Sets.newHashSet(getProblem().getPieceByPos(currentX, currentY),
                 getProblem().getPieceByPos(neighborX, neighborY));
 
-        Set<Variable<Piece, PieceContent>> variables = getVariablesFromPieceSet(pieces);
+        Set<Variable<Pole, PoleContent>> variables = getVariablesFromPieceSet(poles);
 
 
-        Predicate<Board> predicate = board -> {
+        Predicate<MagnetPuzzleBoard> predicate = board -> {
             return board.piecesHasOppositePole(board.getPieceByPos(currentX, currentY)
                     , board.getPieceByPos(neighborX, neighborY));
         };
@@ -169,23 +169,22 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
     }
 
     @Override
-    public void assignValueToVariable(PieceContent value, Piece variable) {
-        Piece piece = getProblem().getPieces()[variable.getPosition().getX()][variable.getPosition().getX()];
+    public void assignValueToVariable(PoleContent value, Pole variable) {
 
-        actionHistories.push(new ActionHistory(piece, getVariable(piece).getValue(), value));
+        Pole pole = getProblem().getPoles()[variable.getPosition().getX()][variable.getPosition().getY()];
 
-        if (getVariable(piece).getValue() != null) {
-            getVariable(piece).getDomain().removeValue(value);
-        }
+        actionHistories.push(new ActionHistory(pole, getVariable(pole).getValue(), value));
 
-        getProblem().setPoleOn(piece.getPosition().getX(), piece.getPosition().getY(), value);
-        getVariable(piece).setValue(value);
+        getVariable(pole).getDomain().removeValue(value);
 
-        getAssignment().add(getVariable(piece));
+        getProblem().setPoleOn(pole.getPosition().getX(), pole.getPosition().getY(), value);
+        getVariable(pole).setValue(value);
+
+        getAssignment().add(getVariable(pole));
     }
 
     @Override
-    public boolean canAssignValueToVariable(PieceContent value, Piece variable) {
+    public boolean canAssignValueToVariable(PoleContent value, Pole variable) {
         return getProblem().canSetPoleOn(variable.getPosition().getX(), variable.getPosition().getY(), value);
     }
 
@@ -195,15 +194,15 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
             ActionHistory lastAction = actionHistories.pop();
 
-            Position lastActionPosition = lastAction.piece.getPosition();
+            Position lastActionPosition = lastAction.pole.getPosition();
 
             getProblem()
-                    .getPieces()[lastActionPosition.getX()][lastActionPosition.getY()]
-                    .setContent(lastAction.previous == null ? PieceContent.None : lastAction.previous);
+                    .getPoles()[lastActionPosition.getX()][lastActionPosition.getY()]
+                    .setContent(lastAction.previous == null ? PoleContent.None : lastAction.previous);
 
-            getVariable(lastAction.piece).setValue(lastAction.previous);
-            getVariable(lastAction.piece).getDomain().addValue(lastAction.newVal);
-            getAssignment().remove(getVariable(lastAction.piece));
+            getVariable(lastAction.pole).setValue(lastAction.previous);
+            getVariable(lastAction.pole).getDomain().addValue(lastAction.newVal);
+            getAssignment().remove(getVariable(lastAction.pole));
 
         }
     }
@@ -215,9 +214,9 @@ public class MagnetPuzzleCSP extends CSP<Board, Piece, PieceContent> {
 
     @AllArgsConstructor
     private static class ActionHistory {
-        Piece piece;
-        PieceContent previous;
-        PieceContent newVal;
+        Pole pole;
+        PoleContent previous;
+        PoleContent newVal;
     }
 
 }
